@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+    php:
+        container_name: php
+        build:
+            context: .
+            dockerfile: ./.docker/php.dockerfile
+        working_dir: /var/www
+        volumes:
+            - ./src:/var/www
+        depends_on:
+            - "mysql"
+    nginx:
+        container_name: nginx
+        build:
+            context: .
+            dockerfile: ./.docker/nginx.dockerfile
+        working_dir: /var/www
+        volumes:
+            - ./src:/var/www
+        depends_on:
+            - "php"
+        ports:
+            - 80:80
+    mysql:
+        container_name: mysql
+        image: mysql:8.0
+        volumes:
+            - mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+        ports:
+            - 3306:3306
+volumes:
+    mysql:
